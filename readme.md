@@ -1,4 +1,4 @@
-# React.js Version 18 Study Notes
+# React.js Version 19 Study Notes
 
 ## 1. Introduction to React.js
 ### What is React?
@@ -10,7 +10,7 @@ React is a JavaScript library for building user interfaces. It is maintained by 
 - **2013:** Open-sourced at JSConf US.
 - **2015:** React Native was introduced.
 - **2017:** React Fiber was introduced.
-- **2022:** React 18 introduced Concurrent Mode and other new features.
+- **2021:** React 18 introduced Concurrent Mode.
 
 ### Key Features
 - **Declarative:** React makes it painless to create interactive UIs. Design simple views for each state in your application, and React will efficiently update and render just the right components when your data changes.
@@ -370,79 +370,54 @@ function useFriendStatus(friendID) {
 - Only call Hooks at the top level.
 - Only call Hooks from React function components or custom Hooks.
 
-## 7. React Router (React Router 6)
+## 7. React Router
 ### Introduction to React Router
 React Router is a standard library for routing in React. It enables the navigation among views of various components in a React Application, allows changing the browser URL, and keeps UI in sync with the URL.
 
 ### Setting Up React Router
 ```bash
-npm install react-router-dom@6
-```
-
-### Basic Usage
-React Router 6 introduces a simpler, more declarative syntax for defining routes.
-
-```jsx
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-
-function App() {
-  return (
-    <Router>
-      <nav>
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/users">Users</Link>
-      </nav>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/users" element={<Users />} />
-      </Routes>
-    </Router>
-  );
-}
-
-function Home() {
-  return <h2>Home</h2>;
-}
-
-function About() {
-  return <h2>About</h2>;
-}
-
-function Users() {
-  return <h2>Users</h2>;
-}
+npm install react-router-dom
 ```
 
 ### Route Parameters
 Route parameters are used to capture specific values from the URL.
 
 ```jsx
-import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useParams
+} from "react-router-dom";
 
 function App() {
   return (
     <Router>
-      <nav>
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/users">Users</Link>
-        <Link to="/user/1">User 1</Link>
-        <Link to="/user/2">User 2</Link>
-      </nav>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/user/:id" element={<User />} />
-      </Routes>
+      <div>
+        <ul>
+          <li>
+            <Link to="/about">About</Link>
+          </li>
+          <li>
+            <Link to="/users">Users</Link>
+          </li>
+        </ul>
+
+        <Switch>
+          <Route path="/about">
+            <About />
+          </Route>
+          <Route path="/users">
+            <Users />
+          </Route>
+          <Route path="/:id">
+            <Child />
+          </Route>
+        </Switch>
+      </div>
     </Router>
   );
-}
-
-function Home() {
-  return <h2>Home</h2>;
 }
 
 function About() {
@@ -453,9 +428,13 @@ function Users() {
   return <h2>Users</h2>;
 }
 
-function User() {
+function Child() {
   let { id } = useParams();
-  return <h2>User ID: {id}</h2>;
+  return (
+    <div>
+      <h3>ID: {id}</h3>
+    </div>
+  );
 }
 ```
 
@@ -463,49 +442,23 @@ function User() {
 Nested routes allow you to render sub-routes inside a parent route.
 
 ```jsx
-import { BrowserRouter as Router, Routes, Route, Link, Outlet } from 'react-router-dom';
-
 function App() {
   return (
     <Router>
-      <nav>
-        <Link to="/">Home</Link>
-        <Link to="/dashboard">Dashboard</Link>
-      </nav>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route path="messages" element={<Messages />} />
-          <Route path="tasks" element={<Tasks />} />
-        </Route>
-      </Routes>
+      <Switch>
+        <Route path="/:id" children={<Child />} />
+      </Switch>
     </Router>
   );
 }
 
-function Home() {
-  return <h2>Home</h2>;
-}
-
-function Dashboard() {
+function Child() {
+  let { id } = useParams();
   return (
     <div>
-      <h2>Dashboard</h2>
-      <nav>
-        <Link to="messages">Messages</Link>
-        <Link to="tasks">Tasks</Link>
-      </nav>
-      <Outlet />
+      <h3>ID: {id}</h3>
     </div>
   );
-}
-
-function Messages() {
-  return <h2>Messages</h2>;
-}
-
-function Tasks() {
-  return <h2>Tasks</h2>;
 }
 ```
 
@@ -513,26 +466,27 @@ function Tasks() {
 Redirects can be used to programmatically navigate users to different routes.
 
 ```jsx
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Redirect } from "react-router-dom";
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Navigate to="/" />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
+      <div>
+        <Switch>
+          <Route path="/home">
+            <Home />
+          </Route>
+          <Redirect from="/old-home" to="/home" />
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </div>
     </Router>
   );
-}
-
-function Home() {
-  return <h2>Home</h2>;
-}
-
-function Login() {
-  return <h2>Login</h2>;
 }
 ```
 
@@ -692,6 +646,77 @@ class MyForm extends React.Component {
         </div>
         <button type="submit">Submit</button>
       </form>
-    )
+    );
   }
-}```
+}
+```
+
+## 9. Styling in React
+### CSS and Inline Styles
+You can style components directly with CSS or use inline styles.
+
+```jsx
+const divStyle = {
+  color: 'blue',
+  backgroundImage: 'url(' + imgUrl + ')',
+};
+
+function HelloWorldComponent() {
+  return <div style={divStyle}>Hello World!</div>;
+}
+```
+
+### CSS Modules
+CSS Modules allow you to scope CSS to a particular component.
+
+```css
+// styles.module.css
+.error {
+  color: red;
+}
+```
+
+```jsx
+import styles from './styles.module.css';
+
+function ErrorMessage() {
+  return <div className={styles.error}>Error!</div>;
+}
+```
+
+### Styled-Components
+Styled-components use tagged template literals to style components.
+
+```jsx
+import styled from 'styled-components';
+
+const Button = styled.button`
+  background: ${props => props.primary ? 'blue' : 'gray'};
+  color: white;
+`;
+
+function App() {
+  return (
+    <div>
+      <Button primary>Primary Button</Button>
+      <Button>Default Button</Button>
+    </div>
+  );
+}
+```
+
+### Emotion
+Emotion is a library designed for writing CSS styles with JavaScript.
+
+```jsx
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react';
+
+const style = css`
+  color: hotpink;
+`;
+
+function App() {
+  return <div css={style}>This is hotpink.</div>;
+}
+```
